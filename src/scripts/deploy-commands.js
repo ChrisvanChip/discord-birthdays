@@ -21,12 +21,17 @@ const commands = commandFiles
 const rest = new REST({ version: "10" }).setToken(token);
 
 async function deploy() {
-  const route = guildId
-    ? Routes.applicationGuildCommands(clientId, guildId)
-    : Routes.applicationCommands(clientId);
+  try {
+    const route = guildId
+      ? Routes.applicationGuildCommands(clientId, guildId)
+      : Routes.applicationCommands(clientId);
 
-  await rest.put(route, { body: commands });
-  console.log(`Registered ${commands.length} command(s) ${guildId ? `for guild ${guildId}` : "globally"}.`);
+    await rest.put(route, { body: commands });
+    console.log(`Registered ${commands.length} command(s) ${guildId ? `for guild ${guildId}` : "globally"}.`);
+  } catch (error) {
+    console.error("Failed to deploy slash commands.", error);
+    process.exit(1);
+  }
 }
 
 deploy();

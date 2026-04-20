@@ -14,9 +14,9 @@ module.exports = {
     try {
       await command.execute(interaction, context);
     } catch (error) {
-      console.error(error);
+      console.error(`Command execution failed: ${interaction.commandName}`, error);
       const response = {
-        content: "Something went wrong while running that command.",
+        content: "Something went wrong while running that command. Please try again or contact an administrator.",
         ephemeral: true,
       };
 
