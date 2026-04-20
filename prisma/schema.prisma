@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Birthday {
+  id        Int      @id @default(autoincrement())
+  guildId   String
+  userId    String
+  month     Int
+  day       Int
+  year      Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([guildId, userId], name: "guildId_userId")
+  @@index([guildId, month, day])
+}
+
+model GuildConfig {
+  guildId           String   @id
+  calendarMessageId String?
+  updatedAt         DateTime @updatedAt
+}

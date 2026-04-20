@@ -1,0 +1,33 @@
+{
+  "name": "discord-birthdays",
+  "version": "1.0.0",
+  "description": "Self-hosted Discord birthday bot for a single guild",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "author": "ChrisvanChip",
+  "scripts": {
+    "start": "node src/index.js",
+    "deploy:commands": "node src/scripts/deploy-commands.js",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "test": "echo \"No tests configured\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ChrisvanChip/discord-birthdays.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ChrisvanChip/discord-birthdays/issues"
+  },
+  "homepage": "https://github.com/ChrisvanChip/discord-birthdays#readme",
+  "dependencies": {
+    "@prisma/client": "^6.19.3",
+    "discord.js": "^14.26.3",
+    "dotenv": "^17.4.2",
+    "node-cron": "^4.2.1"
+  },
+  "devDependencies": {
+    "prisma": "^6.19.3"
+  }
+}
