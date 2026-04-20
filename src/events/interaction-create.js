@@ -3,6 +3,28 @@ const { EmbedBuilder } = require("discord.js");
 module.exports = {
   name: "interactionCreate",
   async execute(interaction, context) {
+    if (interaction.isAutocomplete()) {
+      if (!interaction.inGuild() || interaction.guildId !== context.mainGuildId) {
+        await interaction.respond([]).catch(() => null);
+        return;
+      }
+
+      const command = interaction.client.commands.get(interaction.commandName);
+
+      if (!command || typeof command.autocomplete !== "function") {
+        return;
+      }
+
+      try {
+        await command.autocomplete(interaction, context);
+      } catch (error) {
+        console.error(`Autocomplete failed: ${interaction.commandName}`, error);
+        await interaction.respond([]).catch(() => null);
+      }
+
+      return;
+    }
+
     if (!interaction.isChatInputCommand()) {
       return;
     }

@@ -1,6 +1,26 @@
 const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
 const { syncCalendarEmbed } = require("../services/calendar");
 
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const MONTH_CHOICES = MONTH_NAMES.map((name, index) => ({
+  name: `${index + 1} - ${name}`,
+  value: index + 1,
+}));
+
 function isValidDate(month, day, year) {
   const safeYear = year ?? 2000;
   const date = new Date(Date.UTC(safeYear, month - 1, day));
@@ -37,6 +57,7 @@ module.exports = {
             .setName("month")
             .setDescription("Birth month (1-12)")
             .setRequired(true)
+            .setAutocomplete(true)
             .setMinValue(1)
             .setMaxValue(12)
         )
@@ -67,6 +88,7 @@ module.exports = {
             .setName("month")
             .setDescription("Birth month (1-12)")
             .setRequired(true)
+            .setAutocomplete(true)
             .setMinValue(1)
             .setMaxValue(12)
         )
@@ -79,6 +101,27 @@ module.exports = {
             .setMaxValue(2100)
         )
     ),
+
+  async autocomplete(interaction) {
+    const focused = interaction.options.getFocused(true);
+
+    if (focused.name !== "month") {
+      await interaction.respond([]);
+      return;
+    }
+
+    const query = String(focused.value ?? "").toLowerCase().trim();
+    const filteredChoices =
+      query.length === 0
+        ? MONTH_CHOICES
+        : MONTH_CHOICES.filter(
+            (choice) =>
+              choice.name.toLowerCase().includes(query) ||
+              String(choice.value).startsWith(query)
+          );
+
+    await interaction.respond(filteredChoices.slice(0, 25));
+  },
 
   async execute(interaction, context) {
     const subcommand = interaction.options.getSubcommand();

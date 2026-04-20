@@ -16,9 +16,8 @@ const MONTH_NAMES = [
 ];
 
 function formatBirthday(entry) {
-  const day = String(entry.day).padStart(2, "0");
-  const month = String(entry.month).padStart(2, "0");
-  return entry.year ? `${day}-${month}-${entry.year}` : `${day}-${month}`;
+  const monthName = MONTH_NAMES[entry.month - 1] ?? String(entry.month);
+  return entry.year ? `${entry.day} ${monthName} ${entry.year}` : `${entry.day} ${monthName}`;
 }
 
 function buildCalendarEmbed(birthdays) {
