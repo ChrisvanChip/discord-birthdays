@@ -1,17 +1,16 @@
-# Discord Birthdays 🎉
+<div style="text-align: center;">
+  <img width="1280" height="640" alt="Banner" src="https://github.com/user-attachments/assets/0d8a5aac-813a-444a-8ce4-370173d003c2" />
+</div>
 
-Self-hosted Discord bot to celebrate birthdays in your server.
+### Self-hosted Discord bot to celebrate your member's birthdays.
 
-## Features
+Built to fill the gap of good self-hostable birthday bots, this project provides a lightweight, reliable solution to automate birthday announcements for your Discord community.
 
-- Users can register their birthday with `/birthday register`
-- When it's their special day, the bot will ping a role (like @Birthday Pings) so your members can celebrate their birthday
-- Birthday calendar in a channel (like #birthdays), this embed will be updated when members register their birthdays
-- Handles member joins/leaves so you won't be notified for members who aren't in your community anymore
+Featuring simple registration via `/birthday register`, the bot triggers automated role pings on your member's special day, and maintains a dynamic birthday calendar channel.
+
+Built with security in mind, so your users cannot update their birthday more than once. And when a member leaves? We'll clean them up from the calendar right away!
 
 ## Environment
-
-Copy `.env.example` to `.env`. For reference:
 
 | Variable | Description |
 | :--- | :--- |
@@ -28,9 +27,13 @@ Copy `.env.example` to `.env`. For reference:
 | `POSTGRES_PASSWORD` | Postgres password for Docker Compose |
 | `DATABASE_URL` | Prisma connection string |
 
-## Local
+## Local setup (dev)
 
 ```bash
+cp .env.example .env
+
+# fill .env fields, then:
+
 npm install
 npm run prisma:generate
 npm run prisma:push
@@ -38,10 +41,12 @@ npm run deploy:commands
 npm start
 ```
 
-## Docker
+## Docker setup (prod)
 
 ```bash
 cp .env.example .env
+
 # fill .env fields, then:
+
 docker compose up --build
 ```
