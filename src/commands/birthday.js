@@ -23,7 +23,7 @@ module.exports = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName("register")
-        .setDescription("Register your birthday")
+        .setDescription("Register your birthday. You can only register once, so double-check your input!")
         .addIntegerOption((option) =>
           option
             .setName("day")
@@ -52,7 +52,7 @@ module.exports = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName("update")
-        .setDescription("Manager-only birthday update")
+        .setDescription("Staff-only birthday update (ie. for corrections, migrations)")
         .addUserOption((option) => option.setName("user").setDescription("User to update").setRequired(true))
         .addIntegerOption((option) =>
           option
@@ -88,7 +88,7 @@ module.exports = {
 
     if (!isValidDate(month, day, year)) {
       await interaction.reply({
-        embeds: [birthdayReplyEmbed("Invalid Date", "That date is invalid. Please use a real calendar day.")],
+        embeds: [birthdayReplyEmbed("Invalid date", "That date is invalid. Please use a real calendar day.")],
         ephemeral: true,
       });
       return;
@@ -108,8 +108,8 @@ module.exports = {
         await interaction.reply({
           embeds: [
             birthdayReplyEmbed(
-              "Birthday Already Registered",
-              "You already registered your birthday. Please contact a manager if you need it updated."
+              "Birthday already registered",
+              "You already registered your birthday. Please contact a moderator if you need it updated."
             ),
           ],
           ephemeral: true,
@@ -135,7 +135,7 @@ module.exports = {
       });
 
       await interaction.reply({
-        embeds: [birthdayReplyEmbed("Birthday Registered", `Saved birthday as ${birthdayLabel(day, month, year)}.`)],
+        embeds: [birthdayReplyEmbed("Birthday registered!", `We've put your birthday as ${birthdayLabel(day, month, year)} on the calendar!`)],
         ephemeral: true,
       });
       return;
@@ -147,7 +147,7 @@ module.exports = {
 
       if (!hasRole) {
         await interaction.reply({
-          embeds: [birthdayReplyEmbed("Permission Denied", "Only managers can use this command.")],
+          embeds: [birthdayReplyEmbed("Permission denied", "Only moderators can use this command.")],
           ephemeral: true,
         });
         return;
@@ -181,7 +181,7 @@ module.exports = {
 
       await interaction.reply({
         embeds: [
-          birthdayReplyEmbed("Birthday Updated", `Updated <@${targetUser.id}> to ${birthdayLabel(day, month, year)}.`),
+          birthdayReplyEmbed("Birthday updated", `Updated <@${targetUser.id}> to ${birthdayLabel(day, month, year)}.`),
         ],
         ephemeral: true,
       });

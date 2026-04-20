@@ -1,33 +1,33 @@
-# discord-birthdays
+# Discord Birthdays 🎉
 
-Self-hosted Discord bot for birthday registration in one guild.
+Self-hosted Discord bot to celebrate birthdays in your server.
 
 ## Features
 
-- Discord.js + Node.js architecture with auto-loading for commands, events, and jobs.
-- Prisma ORM with PostgreSQL persistence.
-- `/birthday register <day> <month> [year]` (immutable for regular users).
-- `/birthday update <user> <day> <month> [year]` restricted to `MANAGER_ROLE`.
-- Calendar embed in `CALENDAR_CHANNEL` with persisted message id and auto-updates.
-- UTC birthday announcements in `ANNOUNCE_CHANNEL` with `ANNOUNCE_PING` role mention.
-- Guild restriction via `MAIN_GUILD`.
+- Users can register their birthday with `/birthday register`
+- When it's their special day, the bot will ping a role (like @Birthday Pings) so your members can celebrate their birthday
+- Birthday calendar in a channel (like #birthdays), this embed will be updated when members register their birthdays
 
 ## Environment
 
-Copy `.env.example` to `.env` and set values:
+Copy `.env.example` to `.env`. For reference:
 
-- `BOT_TOKEN`: Discord bot token.
-- `CLIENT_ID`: Discord application client ID.
-- `MAIN_GUILD`: Guild ID this bot is allowed to operate in.
-- `MANAGER_ROLE`: Role ID allowed to run `/birthday update`.
-- `CALENDAR_CHANNEL`: Channel ID to host the birthday calendar embed.
-- `ANNOUNCE_CHANNEL`: Channel ID for birthday announcement embeds.
-- `ANNOUNCE_PING`: Role ID to mention in announcement message content.
-- `BIRTHDAY_JOB_CRON`: Cron expression (UTC) for birthday checks (default `0 0 * * *`).
-- `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`: Postgres service variables for Docker Compose.
-- `DATABASE_URL`: Prisma connection string.
+| Variable | Description |
+| :--- | :--- |
+| `BOT_TOKEN` | Discord bot token |
+| `CLIENT_ID` | Discord application client ID |
+| `MAIN_GUILD` | Guild ID this bot is allowed to operate in |
+| `MANAGER_ROLE` | Role ID allowed to run `/birthday update` |
+| `CALENDAR_CHANNEL` | Channel ID to host the birthday calendar embed |
+| `ANNOUNCE_CHANNEL` | Channel ID for birthday announcement embeds |
+| `ANNOUNCE_PING` | Role ID to mention in announcement message content |
+| `BIRTHDAY_JOB_CRON` | Cron expression (UTC) for birthday checks (default `0 7 * * *`) |
+| `POSTGRES_DB` | Postgres database name for Docker Compose |
+| `POSTGRES_USER` | Postgres username for Docker Compose |
+| `POSTGRES_PASSWORD` | Postgres password for Docker Compose |
+| `DATABASE_URL` | Prisma connection string |
 
-## Local setup
+## Local
 
 ```bash
 npm install
@@ -41,7 +41,6 @@ npm start
 
 ```bash
 cp .env.example .env
-# fill required variables
-
+# fill .env fields, then:
 docker compose up --build
 ```

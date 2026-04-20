@@ -12,7 +12,7 @@ module.exports = {
         embeds: [
           new EmbedBuilder()
             .setColor(0xed4245)
-            .setTitle("Guild Not Allowed")
+            .setTitle("Guild not allowed")
             .setDescription("This bot is configured for a different guild."),
         ],
         ephemeral: true,

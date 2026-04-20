@@ -49,7 +49,7 @@ function buildCalendarEmbed(birthdays) {
   return new EmbedBuilder()
     .setColor(0x5865f2)
     .setTitle("Birthday Calendar")
-    .setDescription("🔹 Register your own birthday with /birthday register <day> <month>")
+    .setDescription("🔹 Register your own birthday with `/birthday register <day> <month>`")
     .setFields(fields)
     .setTimestamp(new Date());
 }

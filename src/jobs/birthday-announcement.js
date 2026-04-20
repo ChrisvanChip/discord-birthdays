@@ -3,7 +3,7 @@ const cron = require("node-cron");
 
 module.exports = {
   schedule({ client, prisma, mainGuildId, announceChannelId, announcePingRoleId }) {
-    const cronExpression = process.env.BIRTHDAY_JOB_CRON || "0 0 * * *";
+    const cronExpression = process.env.BIRTHDAY_JOB_CRON || "0 7 * * *";
     if (!cron.validate(cronExpression)) {
       console.error("Invalid BIRTHDAY_JOB_CRON expression.");
       return;
@@ -41,8 +41,8 @@ module.exports = {
         const mentions = birthdays.map((entry) => `<@${entry.userId}>`).join(", ");
         const embed = new EmbedBuilder()
           .setColor(0x57f287)
-          .setTitle("Birthday Announcement")
-          .setDescription(`It's ${mentions}'s birthday today!! Wish them a happy birthday <3`)
+          .setTitle("It's a special day! 🎉")
+          .setDescription(`Because... it's ${mentions}'s birthday today!! Wish them a happy birthday <3`)
           .setTimestamp(new Date());
 
         await channel.send({

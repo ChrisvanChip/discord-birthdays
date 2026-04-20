@@ -4,6 +4,7 @@
   "description": "Self-hosted Discord birthday bot for a single guild",
   "main": "src/index.js",
   "type": "commonjs",
+  "author": "ChrisvanChip",
   "scripts": {
     "start": "node src/index.js",
     "deploy:commands": "node src/scripts/deploy-commands.js",
