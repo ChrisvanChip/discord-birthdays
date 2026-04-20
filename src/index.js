@@ -15,7 +15,9 @@ if (!token || !mainGuildId) {
 }
 
 const prisma = new PrismaClient();
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
+});
 client.commands = new Collection();
 
 const context = {

@@ -240,13 +240,14 @@ module.exports = {
             userId: targetUser.id,
           },
         },
-        update: { day, month, year },
+        update: { day, month, year, isActive: true },
         create: {
           guildId: interaction.guildId,
           userId: targetUser.id,
           day,
           month,
           year,
+          isActive: true,
         },
       });
 

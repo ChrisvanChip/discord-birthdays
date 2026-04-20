@@ -28,6 +28,7 @@ module.exports = {
         const birthdays = await prisma.birthday.findMany({
           where: {
             guildId: mainGuildId,
+            isActive: true,
             month,
             day,
           },

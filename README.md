@@ -7,6 +7,7 @@ Self-hosted Discord bot to celebrate birthdays in your server.
 - Users can register their birthday with `/birthday register`
 - When it's their special day, the bot will ping a role (like @Birthday Pings) so your members can celebrate their birthday
 - Birthday calendar in a channel (like #birthdays), this embed will be updated when members register their birthdays
+- Handles member joins/leaves so you won't be notified for members who aren't in your community anymore
 
 ## Environment
 

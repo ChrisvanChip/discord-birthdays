@@ -84,7 +84,9 @@ async function syncCalendarEmbed({
     return;
   }
 
-  const birthdays = await prisma.birthday.findMany({ where: { guildId } });
+  const birthdays = await prisma.birthday.findMany({
+    where: { guildId, isActive: true },
+  });
   const embed = buildCalendarEmbed(birthdays);
 
   const config = await prisma.guildConfig.findUnique({ where: { guildId } });
