@@ -2,13 +2,13 @@
   <img width="1280" height="640" alt="Banner" src="https://github.com/user-attachments/assets/0d8a5aac-813a-444a-8ce4-370173d003c2" />
 </div>
 
-### Self-hosted Discord bot to celebrate your member's birthdays.
+### Self-hosted Discord bot to celebrate your members' birthdays.
 
 Built to fill the gap of good self-hostable birthday bots, this project provides a lightweight, reliable solution to automate birthday announcements for your Discord community.
 
-Featuring simple registration via `/birthday register`, the bot triggers automated role pings on your member's special day, and maintains a dynamic birthday calendar channel.
+Featuring simple registration via `/birthday register`, the bot triggers automated role pings on your members' special day and maintains a dynamic birthday calendar channel.
 
-Built with security in mind, so your users cannot update their birthday more than once. And when a member leaves? We'll clean them up from the calendar right away!
+Built with security in mind, so a user cannot update their birthday more than once. And when a member leaves? We'll clean them up from the calendar right away!
 
 ## Environment
 
