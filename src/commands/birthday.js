@@ -24,7 +24,11 @@ const MONTH_CHOICES = MONTH_NAMES.map((name, index) => ({
 function isValidDate(month, day, year) {
   const safeYear = year ?? 2000;
   const date = new Date(Date.UTC(safeYear, month - 1, day));
-  return date.getUTCFullYear() === safeYear && date.getUTCMonth() + 1 === month && date.getUTCDate() === day;
+  return (
+    date.getUTCFullYear() === safeYear &&
+    date.getUTCMonth() + 1 === month &&
+    date.getUTCDate() === day
+  );
 }
 
 function birthdayLabel(day, month, year) {
@@ -33,7 +37,10 @@ function birthdayLabel(day, month, year) {
 }
 
 function birthdayReplyEmbed(title, description) {
-  return new EmbedBuilder().setColor(0x5865f2).setTitle(title).setDescription(description);
+  return new EmbedBuilder()
+    .setColor(0x5865f2)
+    .setTitle(title)
+    .setDescription(description);
 }
 
 module.exports = {
@@ -43,14 +50,16 @@ module.exports = {
     .addSubcommand((subcommand) =>
       subcommand
         .setName("register")
-        .setDescription("Register your birthday. You can only register once, so double-check your input!")
+        .setDescription(
+          "Register your birthday. You can only register once, so double-check your input!",
+        )
         .addIntegerOption((option) =>
           option
             .setName("day")
             .setDescription("Birth day")
             .setRequired(true)
             .setMinValue(1)
-            .setMaxValue(31)
+            .setMaxValue(31),
         )
         .addIntegerOption((option) =>
           option
@@ -59,7 +68,7 @@ module.exports = {
             .setRequired(true)
             .setAutocomplete(true)
             .setMinValue(1)
-            .setMaxValue(12)
+            .setMaxValue(12),
         )
         .addIntegerOption((option) =>
           option
@@ -67,21 +76,28 @@ module.exports = {
             .setDescription("Birth year (optional)")
             .setRequired(false)
             .setMinValue(1900)
-            .setMaxValue(2100)
-        )
+            .setMaxValue(2100),
+        ),
     )
     .addSubcommand((subcommand) =>
       subcommand
         .setName("update")
-        .setDescription("Staff-only birthday update (ie. for corrections, migrations)")
-        .addUserOption((option) => option.setName("user").setDescription("User to update").setRequired(true))
+        .setDescription(
+          "Staff-only birthday update (ie. for corrections, migrations)",
+        )
+        .addUserOption((option) =>
+          option
+            .setName("user")
+            .setDescription("User to update")
+            .setRequired(true),
+        )
         .addIntegerOption((option) =>
           option
             .setName("day")
             .setDescription("Birth day")
             .setRequired(true)
             .setMinValue(1)
-            .setMaxValue(31)
+            .setMaxValue(31),
         )
         .addIntegerOption((option) =>
           option
@@ -90,7 +106,7 @@ module.exports = {
             .setRequired(true)
             .setAutocomplete(true)
             .setMinValue(1)
-            .setMaxValue(12)
+            .setMaxValue(12),
         )
         .addIntegerOption((option) =>
           option
@@ -98,8 +114,8 @@ module.exports = {
             .setDescription("Birth year (optional)")
             .setRequired(false)
             .setMinValue(1900)
-            .setMaxValue(2100)
-        )
+            .setMaxValue(2100),
+        ),
     ),
 
   async autocomplete(interaction) {
@@ -110,14 +126,16 @@ module.exports = {
       return;
     }
 
-    const query = String(focused.value ?? "").toLowerCase().trim();
+    const query = String(focused.value ?? "")
+      .toLowerCase()
+      .trim();
     const filteredChoices =
       query.length === 0
         ? MONTH_CHOICES
         : MONTH_CHOICES.filter(
             (choice) =>
               choice.name.toLowerCase().includes(query) ||
-              String(choice.value).startsWith(query)
+              String(choice.value).startsWith(query),
           );
 
     await interaction.respond(filteredChoices.slice(0, 25));
@@ -131,7 +149,12 @@ module.exports = {
 
     if (!isValidDate(month, day, year)) {
       await interaction.reply({
-        embeds: [birthdayReplyEmbed("Invalid date", "That date is invalid. Please use a real calendar day.")],
+        embeds: [
+          birthdayReplyEmbed(
+            "Invalid date",
+            "That date is invalid. Please use a real calendar day.",
+          ),
+        ],
         ephemeral: true,
       });
       return;
@@ -152,7 +175,7 @@ module.exports = {
           embeds: [
             birthdayReplyEmbed(
               "Birthday already registered",
-              "You already registered your birthday. Please contact a moderator if you need it updated."
+              "You already registered your birthday. Please contact a moderator if you need it updated.",
             ),
           ],
           ephemeral: true,
@@ -178,7 +201,12 @@ module.exports = {
       });
 
       await interaction.reply({
-        embeds: [birthdayReplyEmbed("Birthday registered!", `We've put your birthday as ${birthdayLabel(day, month, year)} on the calendar!`)],
+        embeds: [
+          birthdayReplyEmbed(
+            "Birthday registered!",
+            `We've put your birthday as ${birthdayLabel(day, month, year)} on the calendar!`,
+          ),
+        ],
         ephemeral: true,
       });
       return;
@@ -186,11 +214,18 @@ module.exports = {
 
     if (subcommand === "update") {
       const managerRoleId = context.managerRoleId;
-      const hasRole = Boolean(managerRoleId && interaction.member?.roles?.cache?.has(managerRoleId));
+      const hasRole = Boolean(
+        managerRoleId && interaction.member?.roles?.cache?.has(managerRoleId),
+      );
 
       if (!hasRole) {
         await interaction.reply({
-          embeds: [birthdayReplyEmbed("Permission denied", "Only moderators can use this command.")],
+          embeds: [
+            birthdayReplyEmbed(
+              "Permission denied",
+              "Only moderators can use this command.",
+            ),
+          ],
           ephemeral: true,
         });
         return;
@@ -224,7 +259,10 @@ module.exports = {
 
       await interaction.reply({
         embeds: [
-          birthdayReplyEmbed("Birthday updated", `Updated <@${targetUser.id}> to ${birthdayLabel(day, month, year)}.`),
+          birthdayReplyEmbed(
+            "Birthday updated",
+            `Updated <@${targetUser.id}> to ${birthdayLabel(day, month, year)}.`,
+          ),
         ],
         ephemeral: true,
       });

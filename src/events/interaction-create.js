@@ -4,7 +4,10 @@ module.exports = {
   name: "interactionCreate",
   async execute(interaction, context) {
     if (interaction.isAutocomplete()) {
-      if (!interaction.inGuild() || interaction.guildId !== context.mainGuildId) {
+      if (
+        !interaction.inGuild() ||
+        interaction.guildId !== context.mainGuildId
+      ) {
         await interaction.respond([]).catch(() => null);
         return;
       }
@@ -51,9 +54,13 @@ module.exports = {
     try {
       await command.execute(interaction, context);
     } catch (error) {
-      console.error(`Command execution failed: ${interaction.commandName}`, error);
+      console.error(
+        `Command execution failed: ${interaction.commandName}`,
+        error,
+      );
       const response = {
-        content: "Something went wrong while running that command. Please try again or contact an administrator.",
+        content:
+          "Something went wrong while running that command. Please try again or contact an administrator.",
         ephemeral: true,
       };
 
