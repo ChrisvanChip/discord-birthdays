@@ -1,42 +1,62 @@
+const { EmbedBuilder } = require("discord.js");
 const cron = require("node-cron");
 
 module.exports = {
-  schedule({ client, prisma }) {
-    const cronExpression = process.env.BIRTHDAY_JOB_CRON || "0 9 * * *";
+  schedule({ client, prisma, mainGuildId, announceChannelId, announcePingRoleId }) {
+    const cronExpression = process.env.BIRTHDAY_JOB_CRON || "0 0 * * *";
     if (!cron.validate(cronExpression)) {
-      console.error(`Invalid BIRTHDAY_JOB_CRON expression: ${cronExpression}`);
+      console.error("Invalid BIRTHDAY_JOB_CRON expression.");
       return;
     }
 
-    cron.schedule(cronExpression, async () => {
-      const channelId = process.env.BIRTHDAY_ANNOUNCEMENT_CHANNEL_ID;
+    cron.schedule(
+      cronExpression,
+      async () => {
+        if (!announceChannelId || !mainGuildId) {
+          return;
+        }
 
-      if (!channelId) {
-        return;
-      }
+        const channel = await client.channels.fetch(announceChannelId).catch(() => null);
+        if (!channel || !channel.isTextBased() || channel.guildId !== mainGuildId) {
+          return;
+        }
 
-      const channel = await client.channels.fetch(channelId).catch(() => null);
-      if (!channel || !channel.isTextBased()) {
-        return;
-      }
+        const now = new Date();
+        const month = now.getUTCMonth() + 1;
+        const day = now.getUTCDate();
 
-      const now = new Date();
-      const month = now.getUTCMonth() + 1;
-      const day = now.getUTCDate();
+        const birthdays = await prisma.birthday.findMany({
+          where: {
+            guildId: mainGuildId,
+            month,
+            day,
+          },
+          orderBy: { userId: "asc" },
+        });
 
-      const birthdays = await prisma.birthday.findMany({
-        where: {
-          guildId: channel.guildId,
-          month,
-          day,
-        },
-      });
-      if (birthdays.length === 0) {
-        return;
-      }
+        if (birthdays.length === 0) {
+          return;
+        }
 
-      const mentions = birthdays.map((entry) => `<@${entry.userId}>`).join(", ");
-      await channel.send(`🎉 Happy birthday ${mentions}!`);
-    });
+        const mentions = birthdays.map((entry) => `<@${entry.userId}>`).join(", ");
+        const embed = new EmbedBuilder()
+          .setColor(0x57f287)
+          .setTitle("Birthday Announcement")
+          .setDescription(`It's ${mentions}'s birthday today!! Wish them a happy birthday <3`)
+          .setTimestamp(new Date());
+
+        await channel.send({
+          content: announcePingRoleId ? `<@&${announcePingRoleId}>` : undefined,
+          embeds: [embed],
+          allowedMentions: announcePingRoleId
+            ? {
+                roles: [announcePingRoleId],
+                users: birthdays.map((entry) => entry.userId),
+              }
+            : { users: birthdays.map((entry) => entry.userId) },
+        });
+      },
+      { timezone: "UTC" }
+    );
   },
 };

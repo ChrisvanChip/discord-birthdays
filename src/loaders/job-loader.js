@@ -8,6 +8,7 @@ function loadJobs(jobsDir, context) {
     const job = require(path.join(jobsDir, file));
 
     if (typeof job.schedule !== "function") {
+      console.warn(`Skipping invalid job module: ${file}`);
       continue;
     }
 

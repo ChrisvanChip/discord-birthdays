@@ -8,17 +8,28 @@ const { loadEvents } = require("./loaders/event-loader");
 const { loadJobs } = require("./loaders/job-loader");
 
 const token = process.env.BOT_TOKEN;
-if (!token) {
-  throw new Error("BOT_TOKEN is required.");
+const mainGuildId = process.env.MAIN_GUILD;
+
+if (!token || !mainGuildId) {
+  throw new Error("BOT_TOKEN and MAIN_GUILD are required.");
 }
 
 const prisma = new PrismaClient();
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 client.commands = new Collection();
 
+const context = {
+  prisma,
+  mainGuildId,
+  managerRoleId: process.env.MANAGER_ROLE || "",
+  calendarChannelId: process.env.CALENDAR_CHANNEL || "",
+  announceChannelId: process.env.ANNOUNCE_CHANNEL || "",
+  announcePingRoleId: process.env.ANNOUNCE_PING || "",
+};
+
 loadCommands(client, path.join(__dirname, "commands"));
-loadEvents(client, path.join(__dirname, "events"), { prisma });
-loadJobs(path.join(__dirname, "jobs"), { client, prisma });
+loadEvents(client, path.join(__dirname, "events"), context);
+loadJobs(path.join(__dirname, "jobs"), { client, ...context });
 
 client.login(token);
 

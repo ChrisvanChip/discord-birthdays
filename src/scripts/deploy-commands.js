@@ -6,10 +6,10 @@ const { REST, Routes } = require("discord.js");
 
 const token = process.env.BOT_TOKEN;
 const clientId = process.env.CLIENT_ID;
-const guildId = process.env.GUILD_ID;
+const guildId = process.env.MAIN_GUILD;
 
-if (!token || !clientId) {
-  throw new Error("BOT_TOKEN and CLIENT_ID are required.");
+if (!token || !clientId || !guildId) {
+  throw new Error("BOT_TOKEN, CLIENT_ID, and MAIN_GUILD are required.");
 }
 
 const commandsDir = path.join(__dirname, "..", "commands");
@@ -22,12 +22,8 @@ const rest = new REST({ version: "10" }).setToken(token);
 
 async function deploy() {
   try {
-    const route = guildId
-      ? Routes.applicationGuildCommands(clientId, guildId)
-      : Routes.applicationCommands(clientId);
-
-    await rest.put(route, { body: commands });
-    console.log(`Registered ${commands.length} command(s) ${guildId ? `for guild ${guildId}` : "globally"}.`);
+    await rest.put(Routes.applicationGuildCommands(clientId, guildId), { body: commands });
+    console.log(`Registered ${commands.length} command(s) for guild ${guildId}.`);
   } catch (error) {
     console.error("Failed to deploy slash commands.", error);
     process.exit(1);

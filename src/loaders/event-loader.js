@@ -8,6 +8,7 @@ function loadEvents(client, eventsDir, context) {
     const event = require(path.join(eventsDir, file));
 
     if (!event?.name || typeof event.execute !== "function") {
+      console.warn(`Skipping invalid event module: ${file}`);
       continue;
     }
 

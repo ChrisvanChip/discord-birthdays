@@ -8,6 +8,7 @@ function loadCommands(client, commandsDir) {
     const command = require(path.join(commandsDir, file));
 
     if (!command?.data || typeof command.execute !== "function") {
+      console.warn(`Skipping invalid command module: ${file}`);
       continue;
     }
 

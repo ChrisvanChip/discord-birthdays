@@ -1,8 +1,19 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { EmbedBuilder, SlashCommandBuilder } = require("discord.js");
+const { syncCalendarEmbed } = require("../services/calendar");
 
-function isValidDate(month, day) {
-  const date = new Date(Date.UTC(2000, month - 1, day));
-  return date.getUTCMonth() + 1 === month && date.getUTCDate() === day;
+function isValidDate(month, day, year) {
+  const safeYear = year ?? 2000;
+  const date = new Date(Date.UTC(safeYear, month - 1, day));
+  return date.getUTCFullYear() === safeYear && date.getUTCMonth() + 1 === month && date.getUTCDate() === day;
+}
+
+function birthdayLabel(day, month, year) {
+  const base = `${String(day).padStart(2, "0")}-${String(month).padStart(2, "0")}`;
+  return year ? `${base}-${year}` : base;
+}
+
+function birthdayReplyEmbed(title, description) {
+  return new EmbedBuilder().setColor(0x5865f2).setTitle(title).setDescription(description);
 }
 
 module.exports = {
@@ -15,6 +26,14 @@ module.exports = {
         .setDescription("Register your birthday")
         .addIntegerOption((option) =>
           option
+            .setName("day")
+            .setDescription("Birth day")
+            .setRequired(true)
+            .setMinValue(1)
+            .setMaxValue(31)
+        )
+        .addIntegerOption((option) =>
+          option
             .setName("month")
             .setDescription("Birth month (1-12)")
             .setRequired(true)
@@ -23,49 +42,149 @@ module.exports = {
         )
         .addIntegerOption((option) =>
           option
+            .setName("year")
+            .setDescription("Birth year (optional)")
+            .setRequired(false)
+            .setMinValue(1900)
+            .setMaxValue(2100)
+        )
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
+        .setName("update")
+        .setDescription("Manager-only birthday update")
+        .addUserOption((option) => option.setName("user").setDescription("User to update").setRequired(true))
+        .addIntegerOption((option) =>
+          option
             .setName("day")
             .setDescription("Birth day")
             .setRequired(true)
             .setMinValue(1)
             .setMaxValue(31)
         )
+        .addIntegerOption((option) =>
+          option
+            .setName("month")
+            .setDescription("Birth month (1-12)")
+            .setRequired(true)
+            .setMinValue(1)
+            .setMaxValue(12)
+        )
+        .addIntegerOption((option) =>
+          option
+            .setName("year")
+            .setDescription("Birth year (optional)")
+            .setRequired(false)
+            .setMinValue(1900)
+            .setMaxValue(2100)
+        )
     ),
 
-  async execute(interaction, { prisma }) {
-    if (interaction.options.getSubcommand() !== "register") {
-      return;
-    }
-
-    const month = interaction.options.getInteger("month", true);
+  async execute(interaction, context) {
+    const subcommand = interaction.options.getSubcommand();
     const day = interaction.options.getInteger("day", true);
+    const month = interaction.options.getInteger("month", true);
+    const year = interaction.options.getInteger("year", false);
 
-    if (!isValidDate(month, day)) {
+    if (!isValidDate(month, day, year)) {
       await interaction.reply({
-        content: "That date is invalid. Please use a real calendar day.",
+        embeds: [birthdayReplyEmbed("Invalid Date", "That date is invalid. Please use a real calendar day.")],
         ephemeral: true,
       });
       return;
     }
 
-    await prisma.birthday.upsert({
-      where: {
-        guildId_userId: {
+    if (subcommand === "register") {
+      const existing = await context.prisma.birthday.findUnique({
+        where: {
+          guildId_userId: {
+            guildId: interaction.guildId,
+            userId: interaction.user.id,
+          },
+        },
+      });
+
+      if (existing) {
+        await interaction.reply({
+          embeds: [
+            birthdayReplyEmbed(
+              "Birthday Already Registered",
+              "You already registered your birthday. Please contact a manager if you need it updated."
+            ),
+          ],
+          ephemeral: true,
+        });
+        return;
+      }
+
+      await context.prisma.birthday.create({
+        data: {
           guildId: interaction.guildId,
           userId: interaction.user.id,
+          day,
+          month,
+          year,
         },
-      },
-      update: { month, day },
-      create: {
-        guildId: interaction.guildId,
-        userId: interaction.user.id,
-        month,
-        day,
-      },
-    });
+      });
 
-    await interaction.reply({
-      content: `Birthday saved as ${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}.`,
-      ephemeral: true,
-    });
+      await syncCalendarEmbed({
+        prisma: context.prisma,
+        client: interaction.client,
+        guildId: interaction.guildId,
+        calendarChannelId: context.calendarChannelId,
+      });
+
+      await interaction.reply({
+        embeds: [birthdayReplyEmbed("Birthday Registered", `Saved birthday as ${birthdayLabel(day, month, year)}.`)],
+        ephemeral: true,
+      });
+      return;
+    }
+
+    if (subcommand === "update") {
+      const managerRoleId = context.managerRoleId;
+      const hasRole = Boolean(managerRoleId && interaction.member?.roles?.cache?.has(managerRoleId));
+
+      if (!hasRole) {
+        await interaction.reply({
+          embeds: [birthdayReplyEmbed("Permission Denied", "Only managers can use this command.")],
+          ephemeral: true,
+        });
+        return;
+      }
+
+      const targetUser = interaction.options.getUser("user", true);
+
+      await context.prisma.birthday.upsert({
+        where: {
+          guildId_userId: {
+            guildId: interaction.guildId,
+            userId: targetUser.id,
+          },
+        },
+        update: { day, month, year },
+        create: {
+          guildId: interaction.guildId,
+          userId: targetUser.id,
+          day,
+          month,
+          year,
+        },
+      });
+
+      await syncCalendarEmbed({
+        prisma: context.prisma,
+        client: interaction.client,
+        guildId: interaction.guildId,
+        calendarChannelId: context.calendarChannelId,
+      });
+
+      await interaction.reply({
+        embeds: [
+          birthdayReplyEmbed("Birthday Updated", `Updated <@${targetUser.id}> to ${birthdayLabel(day, month, year)}.`),
+        ],
+        ephemeral: true,
+      });
+    }
   },
 };

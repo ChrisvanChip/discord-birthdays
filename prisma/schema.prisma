@@ -13,9 +13,16 @@ model Birthday {
   userId    String
   month     Int
   day       Int
+  year      Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([guildId, userId], name: "guildId_userId")
   @@index([guildId, month, day])
+}
+
+model GuildConfig {
+  guildId           String   @id
+  calendarMessageId String?
+  updatedAt         DateTime @updatedAt
 }

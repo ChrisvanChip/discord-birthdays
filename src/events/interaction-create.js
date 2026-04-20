@@ -1,7 +1,22 @@
+const { EmbedBuilder } = require("discord.js");
+
 module.exports = {
   name: "interactionCreate",
   async execute(interaction, context) {
     if (!interaction.isChatInputCommand()) {
+      return;
+    }
+
+    if (!interaction.inGuild() || interaction.guildId !== context.mainGuildId) {
+      await interaction.reply({
+        embeds: [
+          new EmbedBuilder()
+            .setColor(0xed4245)
+            .setTitle("Guild Not Allowed")
+            .setDescription("This bot is configured for a different guild."),
+        ],
+        ephemeral: true,
+      });
       return;
     }
 
