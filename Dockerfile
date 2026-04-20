@@ -10,4 +10,4 @@ RUN npx prisma generate
 
 COPY src ./src
 
-CMD ["sh", "-c", "npx prisma db push && node src/index.js"]
+CMD ["sh", "-c", "npx prisma db push && npm run deploy:commands && node src/index.js"]
